@@ -60,7 +60,7 @@
             "type": "FUNCTION",
             "alias": "",
             "query_location": 93,
-            "function_name": "st_within",
+            "function_name": "st_covers",
             "schema": "",
             "children": [
               {
@@ -69,7 +69,7 @@
                 "alias": "",
                 "query_location": 103,
                 "column_names": [
-                  "powerplants",
+                  "chicago_bgs",
                   "geom"
                 ]
               },
@@ -79,7 +79,7 @@
                 "alias": "",
                 "query_location": 121,
                 "column_names": [
-                  "chicago_bgs",
+                  "powerplants",
                   "geom"
                 ]
               }
