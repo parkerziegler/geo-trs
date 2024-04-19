@@ -1,0 +1,10 @@
+{
+  "original_query": {
+    "text": "SELECT powerplants.primary_source,chicago_bgs.B02001002 FROM powerplants JOIN chicago_bgs ON ST_Within(powerplants.geom, chicago_bgs.geom);",
+    "runtime": 0.0241
+  },
+  "rewritten_query": {
+    "text": "SELECT powerplants.primary_source, chicago_bgs.B02001002 FROM powerplants INNER JOIN chicago_bgs ON (st_covers(chicago_bgs.geom, powerplants.geom));",
+    "runtime": 0.0193
+  }
+}

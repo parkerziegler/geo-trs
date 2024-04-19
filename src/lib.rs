@@ -1,13 +1,16 @@
 mod ast;
+mod codegen;
 mod cost;
 mod parser;
-mod reconstruct;
 
+use crate::ast::DuckDBAST;
+use crate::codegen::codegen_ast;
 use crate::cost::GeoTRSCostFunction;
 use crate::parser::parse_duckdb_ast_to_s_exp;
 use egg::{rewrite as rw, Extractor, RecExpr, Rewrite, Runner, SymbolLang};
 
 pub fn rewrite_query(contents: &str) -> String {
+    let ast: Result<DuckDBAST, serde_json::Error> = serde_json::from_str(&contents);
     let expr = parse_duckdb_ast_to_s_exp(&contents);
 
     let rules: &[Rewrite<SymbolLang, ()>] = &[
@@ -27,9 +30,7 @@ pub fn rewrite_query(contents: &str) -> String {
     println!("best_cost: {}", best_cost);
     println!("best_expr: {}", best_expr.to_string());
 
-    let output = reconstruct::reconstruct(&contents, best_expr.to_string());
-
-    return output;
+    codegen_ast(ast.unwrap(), best_expr.to_string()).to_string()
 }
 
 #[cfg(test)]
@@ -38,12 +39,34 @@ mod tests {
     use std::fs;
 
     #[test]
-    fn test_rewrite_query() {
-        let input_file_path = "queries/chicago_powerplants/chicago_powerplants_input.json";
+    fn test_rewrite_within_query() {
+        let input_file_path =
+            "queries/chicago_powerplants_within/chicago_powerplants_within_input.json";
         let input_file_contents =
             fs::read_to_string(input_file_path).expect("Something went wrong reading the file");
 
-        let output_file_path = "queries/chicago_powerplants/chicago_powerplants_output.json";
+        let output_file_path =
+            "queries/chicago_powerplants_within/chicago_powerplants_within_output.json";
+        let output_file_contents =
+            fs::read_to_string(output_file_path).expect("Something went wrong reading the file");
+
+        let actual = rewrite_query(&input_file_contents)
+            .parse::<serde_json::Value>()
+            .unwrap();
+        let expected = output_file_contents.parse::<serde_json::Value>().unwrap();
+
+        assert_eq!(actual, expected);
+    }
+
+    #[test]
+    fn test_rewrite_and_intersects_query() {
+        let input_file_path =
+            "queries/chicago_climate_regions_overlaps/chicago_climate_regions_overlaps_input.json";
+        let input_file_contents =
+            fs::read_to_string(input_file_path).expect("Something went wrong reading the file");
+
+        let output_file_path =
+            "queries/chicago_climate_regions_overlaps/chicago_climate_regions_overlaps_output.json";
         let output_file_contents =
             fs::read_to_string(output_file_path).expect("Something went wrong reading the file");
 

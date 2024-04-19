@@ -1,51 +1,32 @@
 use serde::{Deserialize, Serialize};
 
-/// Represents the root node of the JSON AST of a DuckDB query.
+/// The root node of the JSON AST of a DuckDB query.
 #[derive(Serialize, Deserialize)]
 pub struct DuckDBAST {
+    pub error: bool,
     pub statements: Vec<Statement>,
 }
 
-/// Represents a Statement node in the JSON AST of a DuckDB query.
+// A statement object of the JSON AST of a DuckDB query.
 #[derive(Serialize, Deserialize)]
 pub struct Statement {
-    pub node: Node,
+    pub node: SelectNode,
 }
 
-/// Represents a Node node in the JSON AST of a DuckDB query.
+/// The SELECT_NODE node of the JSON AST of a DuckDB query.
 #[derive(Serialize, Deserialize)]
-pub struct Node {
-    pub modifiers: Vec<String>,
-    pub cte_map: CTEMap,
-    pub select_list: Vec<SelectListEntry>,
-    pub from_table: FromTable,
-    pub where_clause: Option<Condition>,
-    pub group_expressions: Vec<String>,
-    pub group_sets: Vec<String>,
-    pub aggregate_handling: String,
-    pub having: Option<String>,
-    pub sample: Option<String>,
-    pub qualify: Option<String>,
+pub struct SelectNode {
+    #[serde(rename = "type")]
+    pub type_: String,
+    pub select_list: Vec<ColumnRef>,
+    pub from_table: JoinNode,
 }
 
-/// Represents a CTEMap node in the JSON AST of a DuckDB query.
+/// The JOIN node of the JSON AST of a DuckDB query.
 #[derive(Serialize, Deserialize)]
-pub struct CTEMap {
-    pub map: Vec<String>,
-}
-
-/// Represents a SelectList node in the JSON AST of a DuckDB query.
-#[derive(Serialize, Deserialize)]
-pub struct SelectListEntry {
-    pub class: String,
-    pub alias: String,
-    pub query_location: i32,
-    pub column_names: Vec<String>,
-}
-
-/// Represents a FromTable node in the JSON AST of a DuckDB query.
-#[derive(Serialize, Deserialize)]
-pub struct FromTable {
+pub struct JoinNode {
+    #[serde(rename = "type")]
+    pub type_: String,
     pub alias: String,
     pub sample: Option<String>,
     pub query_location: i32,
@@ -57,26 +38,11 @@ pub struct FromTable {
     pub using_columns: Vec<String>,
 }
 
-/// Represents a Condition node in the JSON AST of a DuckDB query.
-#[derive(Serialize, Deserialize)]
-pub struct Condition {
-    pub class: String,
-    pub alias: String,
-    pub query_location: i32,
-    pub function_name: String,
-    pub schema: String,
-    pub children: Vec<ColumnRef>,
-    pub filter: Option<String>,
-    pub order_bys: OrderBys,
-    pub distinct: bool,
-    pub is_operator: bool,
-    pub export_state: bool,
-    pub catalog: String,
-}
-
-/// Represents a BaseTable node in the JSON AST of a DuckDB query.
+/// The BASE_TABLE node in the JSON AST of a DuckDB query.
 #[derive(Serialize, Deserialize)]
 pub struct BaseTable {
+    #[serde(rename = "type")]
+    pub type_: String,
     pub alias: String,
     pub sample: Option<String>,
     pub query_location: i32,
@@ -86,14 +52,27 @@ pub struct BaseTable {
     pub catalog_name: String,
 }
 
-/// Represents a ColumnRef node in the JSON AST of a DuckDB query.
+/// The CONDITION node in the JSON AST of a DuckDB query. For our current
+/// benchmarks, this may be either a FUNCTION or a CONJUNCTION_AND.
 #[derive(Serialize, Deserialize)]
-pub struct ColumnRef {
-    pub column_names: Vec<String>,
+#[serde(tag = "type")]
+pub enum Condition {
+    FUNCTION {
+        function_name: String,
+        children: Vec<ColumnRef>,
+    },
+    CONJUNCTION_AND {
+        children: Vec<Condition>,
+    },
 }
 
-/// Represents an OrderBys node in the JSON AST of a DuckDB query.
+/// The COLUMN_REF node in the JSON AST of a DuckDB query.
 #[derive(Serialize, Deserialize)]
-pub struct OrderBys {
-    pub orders: Vec<String>,
+pub struct ColumnRef {
+    class: String,
+    #[serde(rename = "type")]
+    pub type_: String,
+    pub alias: String,
+    pub query_location: i32,
+    pub column_names: Vec<String>,
 }

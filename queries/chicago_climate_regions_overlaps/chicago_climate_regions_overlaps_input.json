@@ -1,0 +1,158 @@
+{
+  "error": false,
+  "statements": [
+    {
+      "node": {
+        "type": "SELECT_NODE",
+        "modifiers": [],
+        "cte_map": {
+          "map": []
+        },
+        "select_list": [
+          {
+            "class": "COLUMN_REF",
+            "type": "COLUMN_REF",
+            "alias": "",
+            "query_location": 7,
+            "column_names": [
+              "climate_impact_regions",
+              "years_2020_2039"
+            ]
+          },
+          {
+            "class": "COLUMN_REF",
+            "type": "COLUMN_REF",
+            "alias": "",
+            "query_location": 47,
+            "column_names": [
+              "acs_chicago_bgs",
+              "B02001002"
+            ]
+          }
+        ],
+        "from_table": {
+          "type": "JOIN",
+          "alias": "",
+          "sample": null,
+          "query_location": 101,
+          "left": {
+            "type": "BASE_TABLE",
+            "alias": "",
+            "sample": null,
+            "query_location": 78,
+            "schema_name": "",
+            "table_name": "climate_impact_regions",
+            "column_name_alias": [],
+            "catalog_name": ""
+          },
+          "right": {
+            "type": "BASE_TABLE",
+            "alias": "",
+            "sample": null,
+            "query_location": 106,
+            "schema_name": "",
+            "table_name": "acs_chicago_bgs",
+            "column_name_alias": [],
+            "catalog_name": ""
+          },
+          "condition": {
+            "class": "CONJUNCTION",
+            "type": "CONJUNCTION_AND",
+            "alias": "",
+            "query_location": 190,
+            "children": [
+              {
+                "class": "FUNCTION",
+                "type": "FUNCTION",
+                "alias": "",
+                "query_location": 125,
+                "function_name": "st_intersects",
+                "schema": "",
+                "children": [
+                  {
+                    "class": "COLUMN_REF",
+                    "type": "COLUMN_REF",
+                    "alias": "",
+                    "query_location": 139,
+                    "column_names": [
+                      "climate_impact_regions",
+                      "geom"
+                    ]
+                  },
+                  {
+                    "class": "COLUMN_REF",
+                    "type": "COLUMN_REF",
+                    "alias": "",
+                    "query_location": 168,
+                    "column_names": [
+                      "acs_chicago_bgs",
+                      "geom"
+                    ]
+                  }
+                ],
+                "filter": null,
+                "order_bys": {
+                  "type": "ORDER_MODIFIER",
+                  "orders": []
+                },
+                "distinct": false,
+                "is_operator": false,
+                "export_state": false,
+                "catalog": ""
+              },
+              {
+                "class": "FUNCTION",
+                "type": "FUNCTION",
+                "alias": "",
+                "query_location": 194,
+                "function_name": "st_intersects",
+                "schema": "",
+                "children": [
+                  {
+                    "class": "COLUMN_REF",
+                    "type": "COLUMN_REF",
+                    "alias": "",
+                    "query_location": 208,
+                    "column_names": [
+                      "acs_chicago_bgs",
+                      "geom"
+                    ]
+                  },
+                  {
+                    "class": "COLUMN_REF",
+                    "type": "COLUMN_REF",
+                    "alias": "",
+                    "query_location": 230,
+                    "column_names": [
+                      "climate_impact_regions",
+                      "geom"
+                    ]
+                  }
+                ],
+                "filter": null,
+                "order_bys": {
+                  "type": "ORDER_MODIFIER",
+                  "orders": []
+                },
+                "distinct": false,
+                "is_operator": false,
+                "export_state": false,
+                "catalog": ""
+              }
+            ]
+          },
+          "join_type": "INNER",
+          "ref_type": "REGULAR",
+          "using_columns": []
+        },
+        "where_clause": null,
+        "group_expressions": [],
+        "group_sets": [],
+        "aggregate_handling": "STANDARD_HANDLING",
+        "having": null,
+        "sample": null,
+        "qualify": null
+      }
+    }
+  ]
+}
